@@ -9,3 +9,4 @@ libburst-*.dylib filter=lfs diff=lfs merge=lfs -text
 같은 filter=lfs diff=lfs merge=lfs -text
 파일 filter=lfs diff=lfs merge=lfs -text
 *.dlb filter=lfs diff=lfs merge=lfs -text
+*exr filter=lfs diff=lfs merge=lfs -text
