@@ -858,7 +858,7 @@ Light:
   m_Enabled: 1
   serializedVersion: 11
   m_Type: 0
-  m_Color: {r: 1, g: 0.9926949, b: 0.6933962, a: 1}
+  m_Color: {r: 0.9496389, g: 1, b: 0.4481132, a: 1}
   m_Intensity: 20
   m_Range: 15
   m_SpotAngle: 83.16469
@@ -898,7 +898,7 @@ Light:
     serializedVersion: 2
     m_Bits: 4294967295
   m_RenderingLayerMask: 1
-  m_Lightmapping: 4
+  m_Lightmapping: 2
   m_LightShadowCasterMode: 0
   m_AreaSize: {x: 1, y: 1}
   m_BounceIntensity: 1
@@ -1558,7 +1558,7 @@ Light:
     serializedVersion: 2
     m_Bits: 4294967295
   m_RenderingLayerMask: 1
-  m_Lightmapping: 4
+  m_Lightmapping: 2
   m_LightShadowCasterMode: 0
   m_AreaSize: {x: 1, y: 1}
   m_BounceIntensity: 1
@@ -2362,6 +2362,7 @@ GameObject:
   - component: {fileID: 341351908}
   - component: {fileID: 341351910}
   - component: {fileID: 341351909}
+  - component: {fileID: 341351911}
   m_Layer: 0
   m_Name: 'CandleLight '
   m_TagString: Untagged
@@ -2472,6 +2473,21 @@ Light:
   m_LightUnit: 1
   m_LuxAtDistance: 1
   m_EnableSpotReflector: 1
+--- !u!114 &341351911
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 341351907}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0ee060b6cd65db3419e789df251b00d2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  minIntensity: 0.7
+  maxIntensity: 1.2
+  flickerSpeed: 0.1
 --- !u!1001 &341963991
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -5381,7 +5397,7 @@ Light:
   m_Enabled: 1
   serializedVersion: 11
   m_Type: 0
-  m_Color: {r: 1, g: 0.9926949, b: 0.6933962, a: 1}
+  m_Color: {r: 0.9490196, g: 1, b: 0.44705883, a: 1}
   m_Intensity: 20
   m_Range: 15
   m_SpotAngle: 83.16469
@@ -5421,7 +5437,7 @@ Light:
     serializedVersion: 2
     m_Bits: 4294967295
   m_RenderingLayerMask: 1
-  m_Lightmapping: 4
+  m_Lightmapping: 2
   m_LightShadowCasterMode: 0
   m_AreaSize: {x: 1, y: 1}
   m_BounceIntensity: 1
@@ -5447,6 +5463,7 @@ GameObject:
   - component: {fileID: 648718948}
   - component: {fileID: 648718950}
   - component: {fileID: 648718949}
+  - component: {fileID: 648718951}
   m_Layer: 0
   m_Name: CandleLight
   m_TagString: Untagged
@@ -5557,6 +5574,21 @@ Light:
   m_LightUnit: 1
   m_LuxAtDistance: 1
   m_EnableSpotReflector: 1
+--- !u!114 &648718951
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 648718947}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0ee060b6cd65db3419e789df251b00d2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  minIntensity: 0.5
+  maxIntensity: 1.5
+  flickerSpeed: 0.3
 --- !u!1001 &655889920
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -9204,7 +9236,7 @@ Light:
   m_Enabled: 1
   serializedVersion: 11
   m_Type: 0
-  m_Color: {r: 1, g: 0.9926949, b: 0.6933962, a: 1}
+  m_Color: {r: 0.9490196, g: 0.998263, b: 0.44705883, a: 1}
   m_Intensity: 20
   m_Range: 15
   m_SpotAngle: 83.16469
@@ -9244,7 +9276,7 @@ Light:
     serializedVersion: 2
     m_Bits: 4294967295
   m_RenderingLayerMask: 1
-  m_Lightmapping: 4
+  m_Lightmapping: 2
   m_LightShadowCasterMode: 0
   m_AreaSize: {x: 1, y: 1}
   m_BounceIntensity: 1
@@ -10321,7 +10353,7 @@ Light:
   m_Enabled: 1
   serializedVersion: 11
   m_Type: 0
-  m_Color: {r: 1, g: 0.9926949, b: 0.6933962, a: 1}
+  m_Color: {r: 0.9490196, g: 1, b: 0.44705883, a: 1}
   m_Intensity: 20
   m_Range: 15
   m_SpotAngle: 83.16469
@@ -10361,7 +10393,7 @@ Light:
     serializedVersion: 2
     m_Bits: 4294967295
   m_RenderingLayerMask: 1
-  m_Lightmapping: 4
+  m_Lightmapping: 2
   m_LightShadowCasterMode: 0
   m_AreaSize: {x: 1, y: 1}
   m_BounceIntensity: 1
@@ -11221,7 +11253,7 @@ Light:
     serializedVersion: 2
     m_Bits: 4294967295
   m_RenderingLayerMask: 1
-  m_Lightmapping: 4
+  m_Lightmapping: 2
   m_LightShadowCasterMode: 0
   m_AreaSize: {x: 1, y: 1}
   m_BounceIntensity: 1
@@ -11369,7 +11401,7 @@ Light:
   m_Enabled: 1
   serializedVersion: 11
   m_Type: 0
-  m_Color: {r: 1, g: 0.9926949, b: 0.6933962, a: 1}
+  m_Color: {r: 0.9490196, g: 1, b: 0.44705883, a: 1}
   m_Intensity: 20
   m_Range: 15
   m_SpotAngle: 83.16469
@@ -11409,7 +11441,7 @@ Light:
     serializedVersion: 2
     m_Bits: 4294967295
   m_RenderingLayerMask: 1
-  m_Lightmapping: 4
+  m_Lightmapping: 2
   m_LightShadowCasterMode: 0
   m_AreaSize: {x: 1, y: 1}
   m_BounceIntensity: 1
@@ -16308,7 +16340,7 @@ Light:
   m_Enabled: 1
   serializedVersion: 11
   m_Type: 0
-  m_Color: {r: 1, g: 0.9926949, b: 0.6933962, a: 1}
+  m_Color: {r: 0.9490196, g: 1, b: 0.44705883, a: 1}
   m_Intensity: 20
   m_Range: 15
   m_SpotAngle: 83.16469
@@ -16348,7 +16380,7 @@ Light:
     serializedVersion: 2
     m_Bits: 4294967295
   m_RenderingLayerMask: 1
-  m_Lightmapping: 4
+  m_Lightmapping: 2
   m_LightShadowCasterMode: 0
   m_AreaSize: {x: 1, y: 1}
   m_BounceIntensity: 1
