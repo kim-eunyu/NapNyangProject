@@ -5,14 +5,15 @@ public class ChestOpen : MonoBehaviour
     private Animator animator;
     private bool isOpened = false; 
 
-    // ✨ 1. 여기에 박쥐 입양 UI 패널을 연결할 변수를 추가!
-    [SerializeField] private GameObject batAdoptWindow;
+    // 연결 변수들 (그대로)
+    [SerializeField] private GameObject batAdoptWindow; // 이 상자가 켤 팝업창
+    [SerializeField] private GameObject batPet;       // 이 상자가 켤 '플레이어 펫'
+    [SerializeField] private GameObject chestBat;     // 이 상자가 껐다 켰다 할 '상자 안 박쥐'
 
+    // ... (Awake 함수는 100% 동일!) ...
     void Awake()
     {
         animator = GetComponent<Animator>();
-
-        // (탐지기 1번 - 그대로!)
         if (animator == null)
         {
             Debug.LogError("======= [치명적인 에러!] =======");
@@ -25,9 +26,9 @@ public class ChestOpen : MonoBehaviour
         }
     }
 
+    // --- ✨ 여기가 바뀌었어용! 'OnMouseDown' 함수! ---
     void OnMouseDown()
     {
-        // (탐지기 2, 3번 - 그대로!)
         Debug.Log("OnMouseDown CLICKED! --- 클릭 감지 성공! ---");
         if (animator == null)
         {
@@ -42,15 +43,20 @@ public class ChestOpen : MonoBehaviour
             animator.SetTrigger("Open"); 
             Debug.Log(">>> 상자 열기 신호 (Open) 보냄!");
 
-            // --- ✨ 2. 여기에 UI 켜는 로직을 추가! ---
-            // 먼저, 태그가 "UIPopup"인 창을 모두 끈다.
+            // --- ✨ 여기가 추가됐어용! ---
+            // 상자를 열 때마다, 상자 안 박쥐를 '초기화' (무조건 다시 켜기!)
+            if (chestBat != null)
+            {
+                chestBat.SetActive(true); 
+            }
+            // --- ✨ 여기까지! ---
+
+            // (UI 켜는 로직 - 그대로)
             GameObject[] allPopups = GameObject.FindGameObjectsWithTag("UIPopup");
             foreach (GameObject popup in allPopups)
             {
                 popup.SetActive(false);
             }
-
-            // 그 다음, 박쥐 입양창을 켠다.
             if (batAdoptWindow != null)
             {
                 batAdoptWindow.SetActive(true);
@@ -63,7 +69,7 @@ public class ChestOpen : MonoBehaviour
             animator.SetTrigger("Close"); 
             Debug.Log(">>> 상자 닫기 신호 (Close) 보냄!");
 
-            // --- ✨ 3. (안전장치) 상자를 닫을 때 입양창도 끈다! ---
+            // (입양창 끄기 - 그대로)
             if (batAdoptWindow != null)
             {
                 batAdoptWindow.SetActive(false);
@@ -71,13 +77,31 @@ public class ChestOpen : MonoBehaviour
         }
     }
 
-    // --- ✨ 4. 'O' 버튼이 눌렀을 때 실행할 함수 추가! (public 필수!) ---
+    // ... (AdoptBat 함수는 100% 동일!) ...
     public void AdoptBat()
     {
-        // 여기에 입양했을 때 실행할 코드를 넣으면 돼용
         Debug.Log(">>> 박쥐를 입양했습니다! 🦇");
 
-        // 그리고 창을 닫는다!
+        // (1) 모든 'BatPet' 태그 펫 끄기
+        GameObject[] allBatPets = GameObject.FindGameObjectsWithTag("BatPet");
+        foreach (GameObject pet in allBatPets)
+        {
+            pet.SetActive(false);
+        }
+
+        // (2) '내' 펫 켜기
+        if (batPet != null)
+        {
+            batPet.SetActive(true);
+        }
+
+        // (3) 상자 안의 '원조 박쥐' 끄기
+        if (chestBat != null)
+        {
+            chestBat.SetActive(false);
+        }
+
+        // (4) 입양 창 닫기
         if (batAdoptWindow != null)
         {
             batAdoptWindow.SetActive(false);
