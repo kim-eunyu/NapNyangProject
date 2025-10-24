@@ -5,12 +5,14 @@ public class ChestOpen : MonoBehaviour
     private Animator animator;
     private bool isOpened = false; 
 
+    // ✨ 1. 여기에 박쥐 입양 UI 패널을 연결할 변수를 추가!
+    [SerializeField] private GameObject batAdoptWindow;
+
     void Awake()
     {
         animator = GetComponent<Animator>();
 
-        // ★★★ 탐지기 1번 ★★★
-        // Awake()가 실행될 때, animator를 제대로 찾았는지 확인!
+        // (탐지기 1번 - 그대로!)
         if (animator == null)
         {
             Debug.LogError("======= [치명적인 에러!] =======");
@@ -25,30 +27,60 @@ public class ChestOpen : MonoBehaviour
 
     void OnMouseDown()
     {
-        // ★★★ 탐지기 2번 ★★★
-        // OnMouseDown 함수가 '일단 실행되는지' 확인!
+        // (탐지기 2, 3번 - 그대로!)
         Debug.Log("OnMouseDown CLICKED! --- 클릭 감지 성공! ---");
-
-        // ★★★ 탐지기 3번 ★★★
-        // 클릭은 됐는데, animator 변수가 비어있진 않은지(null인지) 확인!
         if (animator == null)
         {
             Debug.LogError("클릭은 됐지만 animator가 비어있다용! (null)");
-            return; // 함수를 즉시 종료
+            return; 
         }
 
-        // --- (여긴 원래 코드) ---
+        // --- 상자 '열 때' ---
         if (isOpened == false)
         {
             isOpened = true; 
             animator.SetTrigger("Open"); 
             Debug.Log(">>> 상자 열기 신호 (Open) 보냄!");
+
+            // --- ✨ 2. 여기에 UI 켜는 로직을 추가! ---
+            // 먼저, 태그가 "UIPopup"인 창을 모두 끈다.
+            GameObject[] allPopups = GameObject.FindGameObjectsWithTag("UIPopup");
+            foreach (GameObject popup in allPopups)
+            {
+                popup.SetActive(false);
+            }
+
+            // 그 다음, 박쥐 입양창을 켠다.
+            if (batAdoptWindow != null)
+            {
+                batAdoptWindow.SetActive(true);
+            }
         }
+        // --- 상자 '닫을 때' ---
         else 
         {
             isOpened = false; 
             animator.SetTrigger("Close"); 
             Debug.Log(">>> 상자 닫기 신호 (Close) 보냄!");
+
+            // --- ✨ 3. (안전장치) 상자를 닫을 때 입양창도 끈다! ---
+            if (batAdoptWindow != null)
+            {
+                batAdoptWindow.SetActive(false);
+            }
+        }
+    }
+
+    // --- ✨ 4. 'O' 버튼이 눌렀을 때 실행할 함수 추가! (public 필수!) ---
+    public void AdoptBat()
+    {
+        // 여기에 입양했을 때 실행할 코드를 넣으면 돼용
+        Debug.Log(">>> 박쥐를 입양했습니다! 🦇");
+
+        // 그리고 창을 닫는다!
+        if (batAdoptWindow != null)
+        {
+            batAdoptWindow.SetActive(false);
         }
     }
 }
