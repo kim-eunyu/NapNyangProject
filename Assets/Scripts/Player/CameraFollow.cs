@@ -1,135 +1,270 @@
 using UnityEngine;
 
+
+
 public class CameraFollow : MonoBehaviour
+
 {
+
     public Transform target;
+
     public Vector3 offset = new Vector3(0f, 10f, -5f);
 
+
+
     [Header("Zoom Settings")]
+
     public float zoomSpeed = 2f;
-    public float minZoom = 0.5f;     // ÃÖ¼Ò ÁÜ (°¡±îÀÌ)
-    public float maxZoom = 2f;       // ÃÖ´ë ÁÜ (¸Ö¸®)
-    public float zoomSmoothTime = 0.3f; // ÁÜ ºÎµå·¯¿ò (³·À»¼ö·Ï ºü¸§)
+
+    public float minZoom = 0.5f;     // ï¿½Ö¼ï¿½ ï¿½ï¿½ (ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½)
+
+    public float maxZoom = 2f;       // ï¿½Ö´ï¿½ ï¿½ï¿½ (ï¿½Ö¸ï¿½)
+
+    public float zoomSmoothTime = 0.3f; // ï¿½ï¿½ ï¿½Îµå·¯ï¿½ï¿½ (ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½)
+
+
 
     [Header("Edge Pan Settings")]
+
     public bool enableEdgePan = true;
-    public float edgePanSpeed = 5f;      // °¡ÀåÀÚ¸® ÆÐ´× ¼Óµµ
-    public float edgeThickness = 30f;    // °¡ÀåÀÚ¸® µÎ²² (ÇÈ¼¿)
-    public float maxPanDistance = 10f;   // ÃÖ´ë ÆÐ´× °Å¸®
-    public float panSmoothTime = 0.3f;   // ÆÐ´× ºÎµå·¯¿ò
 
-    private float targetZoom = 1f;   // ¸ñÇ¥ ÁÜ °ª
-    private float currentZoom = 1f;  // ÇöÀç ÁÜ °ª
-    private float zoomVelocity = 0f; // SmoothDamp¿ë ¼Óµµ º¯¼ö
+    public float edgePanSpeed = 5f;      // ï¿½ï¿½ï¿½ï¿½ï¿½Ú¸ï¿½ ï¿½Ð´ï¿½ ï¿½Óµï¿½
 
-    private Vector3 panOffset = Vector3.zero;    // ÆÐ´× ¿ÀÇÁ¼Â
-    private Vector3 targetPanOffset = Vector3.zero; // ¸ñÇ¥ ÆÐ´× ¿ÀÇÁ¼Â
-    private Vector3 panVelocity = Vector3.zero;  // ÆÐ´× ¼Óµµ
+    public float edgeThickness = 30f;    // ï¿½ï¿½ï¿½ï¿½ï¿½Ú¸ï¿½ ï¿½Î²ï¿½ (ï¿½È¼ï¿½)
+
+    public float maxPanDistance = 10f;   // ï¿½Ö´ï¿½ ï¿½Ð´ï¿½ ï¿½Å¸ï¿½
+
+    public float panSmoothTime = 0.3f;   // ï¿½Ð´ï¿½ ï¿½Îµå·¯ï¿½ï¿½
+
+
+
+    private float targetZoom = 1f;   // ï¿½ï¿½Ç¥ ï¿½ï¿½ ï¿½ï¿½
+
+    private float currentZoom = 1f;  // ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½
+
+    private float zoomVelocity = 0f; // SmoothDampï¿½ï¿½ ï¿½Óµï¿½ ï¿½ï¿½ï¿½ï¿½
+
+
+
+    private Vector3 panOffset = Vector3.zero;    // ï¿½Ð´ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+
+    private Vector3 targetPanOffset = Vector3.zero; // ï¿½ï¿½Ç¥ ï¿½Ð´ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+
+    private Vector3 panVelocity = Vector3.zero;  // ï¿½Ð´ï¿½ ï¿½Óµï¿½
+
+
 
     void LateUpdate()
+
     {
+
         if (target != null)
+
         {
+
             HandleZoom();
+
             HandleEdgePan();
+
             HandleCenterReset();
 
-            // ÃÖÁ¾ Ä«¸Þ¶ó À§Ä¡ °è»ê
+
+
+            // ï¿½ï¿½ï¿½ï¿½ Ä«ï¿½Þ¶ï¿½ ï¿½ï¿½Ä¡ ï¿½ï¿½ï¿½
+
             Vector3 basePosition = target.position + offset * currentZoom;
+
             transform.position = basePosition + panOffset;
+
         }
+
     }
+
+
 
     void HandleZoom()
+
     {
+
         float scroll = Input.GetAxis("Mouse ScrollWheel");
 
+
+
         if (scroll != 0f)
+
         {
+
             targetZoom -= scroll * zoomSpeed;
+
             targetZoom = Mathf.Clamp(targetZoom, minZoom, maxZoom);
+
         }
 
-        // ºÎµå·´°Ô ÁÜ Àû¿ë
+
+
+        // ï¿½Îµå·´ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
+
         currentZoom = Mathf.SmoothDamp(currentZoom, targetZoom, ref zoomVelocity, zoomSmoothTime);
+
     }
+
+
 
     void HandleEdgePan()
+
     {
+
         if (!enableEdgePan) return;
 
+
+
         Vector3 mousePos = Input.mousePosition;
+
         Vector3 panDirection = Vector3.zero;
 
-        // È­¸é °¡ÀåÀÚ¸® °¨Áö
+
+
+        // È­ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ú¸ï¿½ ï¿½ï¿½ï¿½ï¿½
+
         if (mousePos.x <= edgeThickness)
+
         {
-            panDirection.x = -1f; // ¿ÞÂÊ
+
+            panDirection.x = -1f; // ï¿½ï¿½ï¿½ï¿½
+
         }
+
         else if (mousePos.x >= Screen.width - edgeThickness)
+
         {
-            panDirection.x = 1f; // ¿À¸¥ÂÊ
+
+            panDirection.x = 1f; // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+
         }
+
+
 
         if (mousePos.y <= edgeThickness)
+
         {
-            panDirection.z = -1f; // ¾Æ·¡ÂÊ (3D¿¡¼­´Â ZÃà)
-        }
-        else if (mousePos.y >= Screen.height - edgeThickness)
-        {
-            panDirection.z = 1f; // À§ÂÊ
+
+            panDirection.z = -1f; // ï¿½Æ·ï¿½ï¿½ï¿½ (3Dï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ Zï¿½ï¿½)
+
         }
 
-        // ÆÐ´× ¹æÇâÀÌ ÀÖÀ¸¸é Àû¿ë
-        if (panDirection.magnitude > 0f)
+        else if (mousePos.y >= Screen.height - edgeThickness)
+
         {
+
+            panDirection.z = 1f; // ï¿½ï¿½ï¿½ï¿½
+
+        }
+
+
+
+        // ï¿½Ð´ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
+
+        if (panDirection.magnitude > 0f)
+
+        {
+
             targetPanOffset += panDirection * edgePanSpeed * Time.deltaTime;
 
-            // ÃÖ´ë ÆÐ´× °Å¸® Á¦ÇÑ
+
+
+            // ï¿½Ö´ï¿½ ï¿½Ð´ï¿½ ï¿½Å¸ï¿½ ï¿½ï¿½ï¿½ï¿½
+
             targetPanOffset = Vector3.ClampMagnitude(targetPanOffset, maxPanDistance);
+
         }
 
-        // ºÎµå·´°Ô ÆÐ´× Àû¿ë
+
+
+        // ï¿½Îµå·´ï¿½ï¿½ ï¿½Ð´ï¿½ ï¿½ï¿½ï¿½ï¿½
+
         panOffset = Vector3.SmoothDamp(panOffset, targetPanOffset, ref panVelocity, panSmoothTime);
+
     }
+
+
 
     void HandleCenterReset()
+
     {
-        // ¸¶¿ì½º Áß¾Ó ÈÙ Å¬¸¯ (Button 2)
+
+        // ï¿½ï¿½ï¿½ì½º ï¿½ß¾ï¿½ ï¿½ï¿½ Å¬ï¿½ï¿½ (Button 2)
+
         if (Input.GetMouseButtonDown(2))
+
         {
-            // ÇÃ·¹ÀÌ¾î Áß½ÉÀ¸·Î º¹±Í
+
+            // ï¿½Ã·ï¿½ï¿½Ì¾ï¿½ ï¿½ß½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
+
             targetPanOffset = Vector3.zero;
+
         }
+
     }
 
-    // µð¹ö±×¿ë - Scene ºä¿¡¼­ ÆÐ´× Á¤º¸ Ç¥½Ã
+
+
+    // ï¿½ï¿½ï¿½ï¿½×¿ï¿½ - Scene ï¿½ä¿¡ï¿½ï¿½ ï¿½Ð´ï¿½ ï¿½ï¿½ï¿½ï¿½ Ç¥ï¿½ï¿½
+
     void OnDrawGizmos()
+
     {
+
         if (target == null) return;
 
-        // ÇÃ·¹ÀÌ¾î À§Ä¡ Ç¥½Ã
+
+
+        // ï¿½Ã·ï¿½ï¿½Ì¾ï¿½ ï¿½ï¿½Ä¡ Ç¥ï¿½ï¿½
+
         Gizmos.color = Color.green;
+
         Gizmos.DrawWireSphere(target.position, 0.5f);
 
-        // ÇöÀç Ä«¸Þ¶ó Å¸°Ù À§Ä¡ Ç¥½Ã
+
+
+        // ï¿½ï¿½ï¿½ï¿½ Ä«ï¿½Þ¶ï¿½ Å¸ï¿½ï¿½ ï¿½ï¿½Ä¡ Ç¥ï¿½ï¿½
+
         Vector3 baseTarget = target.position + offset * currentZoom;
+
         Gizmos.color = Color.blue;
+
         Gizmos.DrawWireSphere(baseTarget, 0.3f);
 
-        // ÆÐ´×µÈ ÃÖÁ¾ À§Ä¡ Ç¥½Ã
+
+
+        // ï¿½Ð´×µï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½Ä¡ Ç¥ï¿½ï¿½
+
         Gizmos.color = Color.red;
+
         Gizmos.DrawWireSphere(baseTarget + panOffset, 0.3f);
 
-        // ÆÐ´× ¹æÇâ Ç¥½Ã
+
+
+        // ï¿½Ð´ï¿½ ï¿½ï¿½ï¿½ï¿½ Ç¥ï¿½ï¿½
+
         if (panOffset.magnitude > 0.1f)
+
         {
+
             Gizmos.color = Color.yellow;
+
             Gizmos.DrawLine(baseTarget, baseTarget + panOffset);
+
         }
 
-        // ÃÖ´ë ÆÐ´× ¹üÀ§ Ç¥½Ã
+
+
+        // ï¿½Ö´ï¿½ ï¿½Ð´ï¿½ ï¿½ï¿½ï¿½ï¿½ Ç¥ï¿½ï¿½
+
         Gizmos.color = Color.cyan;
+
         Gizmos.DrawWireSphere(baseTarget, maxPanDistance);
+
     }
+
 }
+
