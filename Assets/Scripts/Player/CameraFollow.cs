@@ -1,270 +1,100 @@
 using UnityEngine;
 
-
-
 public class CameraFollow : MonoBehaviour
-
 {
+    [Header("타겟")]
+    public Transform target; // 플레이어 Transform
 
-    public Transform target;
+    [Header("속도 및 감도")]
+    public float rotationSpeed = 150.0f; // 마우스 회전 속도
+    public float zoomSpeed = 5.0f;      // 줌 속도
+    public float rotationSmoothTime = 0.12f; // 회전 부드러움
 
-    public Vector3 offset = new Vector3(0f, 10f, -5f);
+    [Header("거리 및 각도 제한")]
+    public float distance = 5.0f;     // 카메라와 타겟의 거리
+    public float minDistance = 1.5f;    // 최소 줌 거리
+    public float maxDistance = 10.0f;   // 최대 줌 거리
+    public float minYAngle = -20.0f;  // 최소 Y각도 (아래)
+    public float maxYAngle = 80.0f;   // 최대 Y각도 (위)
 
+    [Header("충돌 처리")]
+    public LayerMask collisionLayers; // 카메라가 충돌할 레이어 (예: "Wall", "Ground")
+    public float collisionPadding = 0.2f; // 충돌 시 벽에서 살짝 띄울 거리
 
+    private float currentX = 0.0f; 
+    private float currentY = 0.0f; 
+    private float targetX = 0.0f;
+    private float targetY = 0.0f;
+    private float targetDistance = 0.0f;
 
-    [Header("Zoom Settings")]
+    private float xVelocity = 0.0f;
+    private float yVelocity = 0.0f;
+    private float zoomVelocity = 0.0f;
 
-    public float zoomSpeed = 2f;
+    void Start()
+    {
+        if (target == null)
+        {
+            Debug.LogError("카메라 타겟이 설정되지 않았습니다!");
+            return;
+        }
 
-    public float minZoom = 0.5f;     // �ּ� �� (������)
+        Vector3 angles = transform.eulerAngles;
+        targetX = currentX = angles.y;
+        targetY = currentY = angles.x;
+        targetDistance = distance;
 
-    public float maxZoom = 2f;       // �ִ� �� (�ָ�)
-
-    public float zoomSmoothTime = 0.3f; // �� �ε巯�� (�������� ����)
-
-
-
-    [Header("Edge Pan Settings")]
-
-    public bool enableEdgePan = true;
-
-    public float edgePanSpeed = 5f;      // �����ڸ� �д� �ӵ�
-
-    public float edgeThickness = 30f;    // �����ڸ� �β� (�ȼ�)
-
-    public float maxPanDistance = 10f;   // �ִ� �д� �Ÿ�
-
-    public float panSmoothTime = 0.3f;   // �д� �ε巯��
-
-
-
-    private float targetZoom = 1f;   // ��ǥ �� ��
-
-    private float currentZoom = 1f;  // ���� �� ��
-
-    private float zoomVelocity = 0f; // SmoothDamp�� �ӵ� ����
-
-
-
-    private Vector3 panOffset = Vector3.zero;    // �д� ������
-
-    private Vector3 targetPanOffset = Vector3.zero; // ��ǥ �д� ������
-
-    private Vector3 panVelocity = Vector3.zero;  // �д� �ӵ�
-
-
+        // <--- 수정!
+        // 시작할 때부터 항상 커서를 보이게 합니다.
+        Cursor.lockState = CursorLockMode.None;
+        Cursor.visible = true;
+    }
 
     void LateUpdate()
-
     {
-
-        if (target != null)
-
-        {
-
-            HandleZoom();
-
-            HandleEdgePan();
-
-            HandleCenterReset();
-
-
-
-            // ���� ī�޶� ��ġ ���
-
-            Vector3 basePosition = target.position + offset * currentZoom;
-
-            transform.position = basePosition + panOffset;
-
-        }
-
-    }
-
-
-
-    void HandleZoom()
-
-    {
-
-        float scroll = Input.GetAxis("Mouse ScrollWheel");
-
-
-
-        if (scroll != 0f)
-
-        {
-
-            targetZoom -= scroll * zoomSpeed;
-
-            targetZoom = Mathf.Clamp(targetZoom, minZoom, maxZoom);
-
-        }
-
-
-
-        // �ε巴�� �� ����
-
-        currentZoom = Mathf.SmoothDamp(currentZoom, targetZoom, ref zoomVelocity, zoomSmoothTime);
-
-    }
-
-
-
-    void HandleEdgePan()
-
-    {
-
-        if (!enableEdgePan) return;
-
-
-
-        Vector3 mousePos = Input.mousePosition;
-
-        Vector3 panDirection = Vector3.zero;
-
-
-
-        // ȭ�� �����ڸ� ����
-
-        if (mousePos.x <= edgeThickness)
-
-        {
-
-            panDirection.x = -1f; // ����
-
-        }
-
-        else if (mousePos.x >= Screen.width - edgeThickness)
-
-        {
-
-            panDirection.x = 1f; // ������
-
-        }
-
-
-
-        if (mousePos.y <= edgeThickness)
-
-        {
-
-            panDirection.z = -1f; // �Ʒ��� (3D������ Z��)
-
-        }
-
-        else if (mousePos.y >= Screen.height - edgeThickness)
-
-        {
-
-            panDirection.z = 1f; // ����
-
-        }
-
-
-
-        // �д� ������ ������ ����
-
-        if (panDirection.magnitude > 0f)
-
-        {
-
-            targetPanOffset += panDirection * edgePanSpeed * Time.deltaTime;
-
-
-
-            // �ִ� �д� �Ÿ� ����
-
-            targetPanOffset = Vector3.ClampMagnitude(targetPanOffset, maxPanDistance);
-
-        }
-
-
-
-        // �ε巴�� �д� ����
-
-        panOffset = Vector3.SmoothDamp(panOffset, targetPanOffset, ref panVelocity, panSmoothTime);
-
-    }
-
-
-
-    void HandleCenterReset()
-
-    {
-
-        // ���콺 �߾� �� Ŭ�� (Button 2)
-
-        if (Input.GetMouseButtonDown(2))
-
-        {
-
-            // �÷��̾� �߽����� ����
-
-            targetPanOffset = Vector3.zero;
-
-        }
-
-    }
-
-
-
-    // ����׿� - Scene �信�� �д� ���� ǥ��
-
-    void OnDrawGizmos()
-
-    {
+        // <--- 수정!
+        // Tab 키 토글 로직, 커서 잠금 확인 로직 '전부 삭제'
 
         if (target == null) return;
 
+        // 1. 마우스 입력 받기
+        // (경고: 커서가 보여도 마우스 입력은 계속 받습니다!)
+        targetX += Input.GetAxis("Mouse X") * rotationSpeed * Time.deltaTime;
+        targetY -= Input.GetAxis("Mouse Y") * rotationSpeed * Time.deltaTime;
 
+        // 2. Y각도 제한
+        targetY = Mathf.Clamp(targetY, minYAngle, maxYAngle);
 
-        // �÷��̾� ��ġ ǥ��
+        // 3. 줌(스크롤) 입력 받기
+        targetDistance -= Input.GetAxis("Mouse ScrollWheel") * zoomSpeed;
+        targetDistance = Mathf.Clamp(targetDistance, minDistance, maxDistance);
 
-        Gizmos.color = Color.green;
+        // 4. 회전값 부드럽게 적용
+        currentX = Mathf.SmoothDamp(currentX, targetX, ref xVelocity, rotationSmoothTime);
+        currentY = Mathf.SmoothDamp(currentY, targetY, ref yVelocity, rotationSmoothTime);
+        distance = Mathf.SmoothDamp(distance, targetDistance, ref zoomVelocity, 0.1f);
 
-        Gizmos.DrawWireSphere(target.position, 0.5f);
+        // 5. 최종 회전값 계산
+        Quaternion rotation = Quaternion.Euler(currentY, currentX, 0);
 
+        // 6. 카메라 위치 계산
+        Vector3 desiredPosition = target.position - (rotation * new Vector3(0, 0, distance));
 
+        // 7. 충돌 처리
+        RaycastHit hit;
+        Vector3 direction = desiredPosition - target.position;
+        float rayDistance = Vector3.Distance(target.position, desiredPosition);
 
-        // ���� ī�޶� Ÿ�� ��ġ ǥ��
-
-        Vector3 baseTarget = target.position + offset * currentZoom;
-
-        Gizmos.color = Color.blue;
-
-        Gizmos.DrawWireSphere(baseTarget, 0.3f);
-
-
-
-        // �д׵� ���� ��ġ ǥ��
-
-        Gizmos.color = Color.red;
-
-        Gizmos.DrawWireSphere(baseTarget + panOffset, 0.3f);
-
-
-
-        // �д� ���� ǥ��
-
-        if (panOffset.magnitude > 0.1f)
-
+        if (Physics.Raycast(target.position, direction.normalized, out hit, rayDistance, collisionLayers))
         {
-
-            Gizmos.color = Color.yellow;
-
-            Gizmos.DrawLine(baseTarget, baseTarget + panOffset);
-
+            transform.position = hit.point + hit.normal * collisionPadding;
+        }
+        else
+        {
+            transform.position = desiredPosition;
         }
 
-
-
-        // �ִ� �д� ���� ǥ��
-
-        Gizmos.color = Color.cyan;
-
-        Gizmos.DrawWireSphere(baseTarget, maxPanDistance);
-
+        // 8. 카메라가 타겟을 바라보게 설정
+        transform.LookAt(target.position);
     }
-
 }
-
