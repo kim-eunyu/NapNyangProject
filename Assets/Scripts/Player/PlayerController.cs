@@ -32,6 +32,7 @@ public class PlayerController : MonoBehaviour
         HandleActions();
         HandleAnimations();
         CheckGroundWithRaycast(); // <--- 이 함수 내부가 수정되었습니다.
+       
     }
 
     void FixedUpdate()
@@ -162,10 +163,7 @@ public class PlayerController : MonoBehaviour
         animator.SetBool("IsHiding", Input.GetKey(KeyCode.LeftControl));
         animator.SetBool("IsGrooming", Input.GetKey(KeyCode.Q));
 
-        if (Input.GetKeyDown(KeyCode.Space) && isGrounded)
-        {
-            rb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
-        }
+        
     }
 
     void HandleAnimations()
@@ -173,7 +171,7 @@ public class PlayerController : MonoBehaviour
         if (animator == null) return;
 
         float speedVal = 0f;
-        
+
         if (moveInput.magnitude > 0.1f)
         {
             if (IsTired())
@@ -189,8 +187,17 @@ public class PlayerController : MonoBehaviour
         animator.SetFloat("Speed", speedVal);
         animator.SetBool("IsJumping", !isGrounded);
         animator.SetBool("IsTired", IsTired());
-    }
 
+        if (Input.GetKeyDown(KeyCode.Space) && isGrounded)
+        {
+
+            rb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
+        }
+    }
+    
+
+
+    
     bool IsTired()
     {
         if (playerMental == null) return false;
