@@ -44,43 +44,58 @@ public class CameraFollow : MonoBehaviour
         targetY = currentY = angles.x;
         targetDistance = distance;
 
-        // <--- 수정!
         // 시작할 때부터 항상 커서를 보이게 합니다.
+        // (이 부분은 '휠 클릭' 방식에 딱 맞습니다!)
         Cursor.lockState = CursorLockMode.None;
         Cursor.visible = true;
     }
 
     void LateUpdate()
     {
-        // <--- 수정!
-        // Tab 키 토글 로직, 커서 잠금 확인 로직 '전부 삭제'
-
         if (target == null) return;
 
-        // 1. 마우스 입력 받기
-        // (경고: 커서가 보여도 마우스 입력은 계속 받습니다!)
-        targetX += Input.GetAxis("Mouse X") * rotationSpeed * Time.deltaTime;
-        targetY -= Input.GetAxis("Mouse Y") * rotationSpeed * Time.deltaTime;
+        // --- ▼▼▼ 여기가 수정되었습니다 ▼▼▼ ---
 
-        // 2. Y각도 제한
-        targetY = Mathf.Clamp(targetY, minYAngle, maxYAngle);
+        // 1. 마우스 '휠 클릭'(Input.GetMouseButton(2))을 누르고 있을 때만 실행
+        if (Input.GetMouseButton(2)) 
+        {
+            // (1-1) 휠 클릭 누르는 동안 커서를 잠그고 숨김
+            Cursor.lockState = CursorLockMode.Locked;
+            Cursor.visible = false;
 
-        // 3. 줌(스크롤) 입력 받기
+            // (1-2) 마우스 입력 받기 (원래 코드)
+            targetX += Input.GetAxis("Mouse X") * rotationSpeed * Time.deltaTime;
+            targetY -= Input.GetAxis("Mouse Y") * rotationSpeed * Time.deltaTime;
+
+            // (1-3) Y각도 제한 (원래 코드)
+            targetY = Mathf.Clamp(targetY, minYAngle, maxYAngle);
+        }
+        else
+        {
+            // (1-4) 마우스 버튼을 뗐을 때 커서를 다시 보이게 함
+            Cursor.lockState = CursorLockMode.None;
+            Cursor.visible = true;
+        }
+        
+        // --- ▲▲▲ 여기까지 수정되었습니다 ▲▲▲ ---
+
+
+        // 3. 줌(스크롤) 입력 받기 (원래 코드 - 항상 작동)
         targetDistance -= Input.GetAxis("Mouse ScrollWheel") * zoomSpeed;
         targetDistance = Mathf.Clamp(targetDistance, minDistance, maxDistance);
 
-        // 4. 회전값 부드럽게 적용
+        // 4. 회전값 부드럽게 적용 (원래 코드)
         currentX = Mathf.SmoothDamp(currentX, targetX, ref xVelocity, rotationSmoothTime);
         currentY = Mathf.SmoothDamp(currentY, targetY, ref yVelocity, rotationSmoothTime);
         distance = Mathf.SmoothDamp(distance, targetDistance, ref zoomVelocity, 0.1f);
 
-        // 5. 최종 회전값 계산
+        // 5. 최종 회전값 계산 (원래 코드)
         Quaternion rotation = Quaternion.Euler(currentY, currentX, 0);
 
-        // 6. 카메라 위치 계산
+        // 6. 카메라 위치 계산 (원래 코드)
         Vector3 desiredPosition = target.position - (rotation * new Vector3(0, 0, distance));
 
-        // 7. 충돌 처리
+        // 7. 충돌 처리 (원래 코드 - 레이어 설정 꼭 해주세요!)
         RaycastHit hit;
         Vector3 direction = desiredPosition - target.position;
         float rayDistance = Vector3.Distance(target.position, desiredPosition);
@@ -94,7 +109,7 @@ public class CameraFollow : MonoBehaviour
             transform.position = desiredPosition;
         }
 
-        // 8. 카메라가 타겟을 바라보게 설정
+        // 8. 카메라가 타겟을 바라보게 설정 (원래 코드)
         transform.LookAt(target.position);
     }
 }
