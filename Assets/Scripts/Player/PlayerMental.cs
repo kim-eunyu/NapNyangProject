@@ -3,33 +3,35 @@ using System.Collections;
 
 public class PlayerMental : MonoBehaviour
 {
-    [Header("Á¤½Å·Â ¼³Á¤")]
+    [Header("ì •ì‹ ë ¥ ì„¤ì •")]
     public float maxMentalHealth = 100f;
     public float currentMentalHealth;
-    public float mentalDecayRate = 0.56f; // ÃÊ´ç 0.56¾¿ °¨¼Ò (3ºĞ)
-    public float groomingRecoveryRate = 20f; // ±×·ç¹Ö ½Ã ÃÊ´ç 20¾¿ È¸º¹ (5ÃÊ)
+    public float mentalDecayRate = 0.56f; // ì´ˆë‹¹ 0.56ì”© ê°ì†Œ (3ë¶„)
+    public float groomingRecoveryRate = 20f; // ê·¸ë£¨ë° ì‹œ ì´ˆë‹¹ 20ì”© íšŒë³µ (5ì´ˆ)
 
-    [Header("UI ÂüÁ¶")]
-    public MentalBarUI mentalHealthUI; // Á¤½Å·Â UI
+    [Header("UI ì—°ë™")]
+    public MentalBarUI mentalHealthUI; // ì •ì‹ ë ¥ UI
+
+    [Header("íš¨ê³¼ ì—°ë™")]
+    [Tooltip("LowMentalEffect ìŠ¤í¬ë¦½íŠ¸ê°€ ìˆëŠ” EffectControllerë¥¼ ì—°ê²°í•´ì£¼ì„¸ìš”.")]
+    public LowMentalEffect lowMentalEffect;
 
     private bool isGrooming = false;
-    private bool isTired = false; // Á¤½Å·Â °í°¥ »óÅÂ
+    private bool isTired = false; // ì •ì‹ ë ¥ 0 ìƒíƒœ
     private PlayerController playerController;
     private Animator animator;
 
     void Start()
     {
-        // ÃÊ±â Á¤½Å·Â ¼³Á¤
         currentMentalHealth = maxMentalHealth;
-
-        // ÄÄÆ÷³ÍÆ® ÂüÁ¶
         playerController = GetComponent<PlayerController>();
         animator = GetComponent<Animator>();
-
-        // Á¤½Å·Â UI ¾÷µ¥ÀÌÆ®
         UpdateMentalUI();
 
-        // Á¤½Å·Â °¨¼Ò ÄÚ·çÆ¾ ½ÃÀÛ
+        // ì‹œì‘í•  ë•Œ ë¹„ë„¤íŒ… ìƒíƒœ 0ìœ¼ë¡œ ì´ˆê¸°í™”
+        UpdateVignetteEffect(); 
+
+        // ì •ì‹ ë ¥ ê°ì†Œ ì½”ë£¨í‹´ ì‹œì‘
         StartCoroutine(MentalHealthDecay());
     }
 
@@ -40,20 +42,18 @@ public class PlayerMental : MonoBehaviour
 
     void CheckGroomingStatus()
     {
-        // ±×·ç¹Ö »óÅÂ È®ÀÎ (QÅ°)
         bool wasGrooming = isGrooming;
         isGrooming = Input.GetKey(KeyCode.Q);
 
-        // ±×·ç¹Ö ½ÃÀÛ/Á¾·á ·Î±×
         if (isGrooming && !wasGrooming)
         {
-            Debug.Log("±×·ç¹Ö ½ÃÀÛ - Á¤½Å·Â È¸º¹ Áß!");
+            Debug.Log("ê·¸ë£¨ë° ì‹œì‘ - ì •ì‹ ë ¥ íšŒë³µ ì¤‘!");
             if (mentalHealthUI != null)
                 mentalHealthUI.ShowGroomingEffect();
         }
         else if (!isGrooming && wasGrooming)
         {
-            Debug.Log("±×·ç¹Ö Á¾·á");
+            Debug.Log("ê·¸ë£¨ë° ì¤‘ì§€");
             if (mentalHealthUI != null)
                 mentalHealthUI.HideGroomingEffect();
         }
@@ -63,78 +63,74 @@ public class PlayerMental : MonoBehaviour
     {
         while (true)
         {
-            yield return new WaitForSeconds(1f); // 1ÃÊ¸¶´Ù ½ÇÇà
+            yield return new WaitForSeconds(1f); // 1ì´ˆë§ˆë‹¤ ì‹¤í–‰
 
             if (isGrooming)
             {
-                // ±×·ç¹Ö ÁßÀÌ¸é Á¤½Å·Â È¸º¹
                 RecoverMentalHealth(groomingRecoveryRate);
             }
             else
             {
-                // ±×·ç¹Ö ÁßÀÌ ¾Æ´Ï¸é Á¤½Å·Â °¨¼Ò
                 DecreaseMentalHealth(mentalDecayRate);
             }
         }
     }
 
-    // Á¤½Å·Â °¨¼Ò
+    // ì •ì‹ ë ¥ ê°ì†Œ
     public void DecreaseMentalHealth(float amount)
     {
         currentMentalHealth -= amount;
         currentMentalHealth = Mathf.Clamp(currentMentalHealth, 0, maxMentalHealth);
 
         UpdateMentalUI();
-
-        // Á¤½Å·Â °í°¥ Ã¼Å©
         CheckTiredState();
+
+        // ì •ì‹ ë ¥ ê°ì†Œ ì‹œ ë¹„ë„¤íŒ… ì—…ë°ì´íŠ¸
+        UpdateVignetteEffect();
     }
 
-    // Á¤½Å·Â È¸º¹
+    // ì •ì‹ ë ¥ íšŒë³µ
     public void RecoverMentalHealth(float amount)
     {
         currentMentalHealth += amount;
         currentMentalHealth = Mathf.Clamp(currentMentalHealth, 0, maxMentalHealth);
 
         UpdateMentalUI();
-
-        // Á¤½Å·Â È¸º¹ Ã¼Å©
         CheckTiredState();
+
+        // ì •ì‹ ë ¥ íšŒë³µ ì‹œ ë¹„ë„¤íŒ… ì—…ë°ì´íŠ¸
+        UpdateVignetteEffect();
     }
 
-    // ÇÇ·Î »óÅÂ È®ÀÎ ¹× Ã³¸®
+    // í”¼ë¡œ ìƒíƒœ í™•ì¸ ë° ì²˜ë¦¬
     void CheckTiredState()
     {
         bool wasTired = isTired;
         isTired = currentMentalHealth <= 0;
 
-        // ÇÇ·Î »óÅÂ º¯È­ ½Ã
         if (isTired && !wasTired)
         {
-            // ÇÇ·Î »óÅÂ ½ÃÀÛ
-            Debug.Log("Á¤½Å·Â °í°¥! ÇÇ·Î »óÅÂ ½ÃÀÛ");
+            Debug.Log("ì •ì‹ ë ¥ 0! í”¼ë¡œ ìƒíƒœ ì‹œì‘");
             OnTiredStart();
         }
         else if (!isTired && wasTired)
         {
-            // ÇÇ·Î »óÅÂ Á¾·á
-            Debug.Log("Á¤½Å·Â È¸º¹! ÇÇ·Î »óÅÂ Á¾·á");
+            Debug.Log("ì •ì‹ ë ¥ íšŒë³µ! í”¼ë¡œ ìƒíƒœ í•´ì œ");
             OnTiredEnd();
         }
     }
 
-    // ÇÇ·Î »óÅÂ ½ÃÀÛ
+    // í”¼ë¡œ ìƒíƒœ ì‹œì‘
     void OnTiredStart()
     {
         if (animator != null)
         {
             animator.SetBool("IsTired", true);
         }
-
-        // ÇÃ·¹ÀÌ¾î ´É·Â Á¦ÇÑ (PlayerController¿¡¼­ ÂüÁ¶)
+        // (PlayerControllerì—ì„œ ì†ë„ ì €í•˜ ë“± ì²˜ë¦¬)
     }
 
-    // ÇÇ·Î »óÅÂ Á¾·á  
+    // í”¼ë¡œ ìƒíƒœ í•´ì œ Â 
     void OnTiredEnd()
     {
         if (animator != null)
@@ -143,7 +139,27 @@ public class PlayerMental : MonoBehaviour
         }
     }
 
-    // Á¤½Å·Â UI ¾÷µ¥ÀÌÆ®
+    // --- [ì¶”ê°€] --- ë¹„ë„¤íŒ… íš¨ê³¼ë¥¼ ì„œì„œíˆ ì¡°ì ˆí•˜ëŠ” ìƒˆ í•¨ìˆ˜
+    void UpdateVignetteEffect()
+    {
+        if (lowMentalEffect == null) return;
+
+        // ì •ì‹ ë ¥ì´ 20% ì´í•˜ì¼ ë•Œë§Œ ê³„ì‚° ì‹œì‘
+        float effectThreshold = maxMentalHealth * 0.2f;
+        float effectPercentage = 0f; // ê¸°ë³¸ê°’ (íš¨ê³¼ ì—†ìŒ)
+
+        if (currentMentalHealth <= effectThreshold)
+        {
+            // í˜„ì¬ ì •ì‹ ë ¥ì´ 20%ì¼ ë•Œ 0.0ì´ ë˜ê³ , 0%ì¼ ë•Œ 1.0ì´ ë˜ëŠ” ê°’ì„ ê³„ì‚°í•´ìš”.
+            effectPercentage = Mathf.InverseLerp(effectThreshold, 0f, currentMentalHealth);
+        }
+
+        // LowMentalEffect ìŠ¤í¬ë¦½íŠ¸ë¡œ 0.0 ~ 1.0 ì‚¬ì´ì˜ ê°’ì„ ì „ë‹¬
+        lowMentalEffect.UpdateEffect(effectPercentage);
+    }
+    // --- [ì¶”ê°€ ë] ---
+
+    // ì •ì‹ ë ¥ UI ì—…ë°ì´íŠ¸
     void UpdateMentalUI()
     {
         if (mentalHealthUI != null)
@@ -152,47 +168,21 @@ public class PlayerMental : MonoBehaviour
         }
         else
         {
-            Debug.Log($"Á¤½Å·Â: {currentMentalHealth:F1}/{maxMentalHealth}"); // UI ¾øÀ» ¶§ ·Î±×·Î Ç¥½Ã
+            Debug.Log($"ì •ì‹ ë ¥: {currentMentalHealth:F1}/{maxMentalHealth}");
         }
     }
 
-    // Å×½ºÆ®¿ë ¸Ş¼­µåµé (Inspector¿¡¼­ ¿ìÅ¬¸¯À¸·Î ½ÇÇà °¡´É)
-    [ContextMenu("Å×½ºÆ®: 10 Á¤½Å·Â °¨¼Ò")]
-    public void TestMentalDamage()
-    {
-        DecreaseMentalHealth(10f);
-    }
+    // í…ŒìŠ¤íŠ¸ìš© í•¨ìˆ˜ë“¤
+    [ContextMenu("í…ŒìŠ¤íŠ¸: 10 ì •ì‹ ë ¥ ê°ì†Œ")]
+    public void TestMentalDamage() { DecreaseMentalHealth(10f); }
+    [ContextMenu("í…ŒìŠ¤íŠ¸: 20 ì •ì‹ ë ¥ íšŒë³µ")]
+    public void TestMentalRecover() { RecoverMentalHealth(20f); }
+    [ContextMenu("í…ŒìŠ¤íŠ¸: ì •ì‹ ë ¥ ëª¨ë‘ ì†Œëª¨")]
+    public void TestMentalEmpty() { DecreaseMentalHealth(currentMentalHealth); }
 
-    [ContextMenu("Å×½ºÆ®: 20 Á¤½Å·Â È¸º¹")]
-    public void TestMentalRecover()
-    {
-        RecoverMentalHealth(20f);
-    }
-
-    [ContextMenu("Å×½ºÆ®: Á¤½Å·Â ¸ğµÎ ¼Ò¸ğ")]
-    public void TestMentalEmpty()
-    {
-        DecreaseMentalHealth(currentMentalHealth);
-    }
-
-    // ¿ÜºÎ¿¡¼­ È£Ãâ °¡´ÉÇÑ ¸Ş¼­µåµé
-    public float GetMentalHealthPercentage()
-    {
-        return currentMentalHealth / maxMentalHealth;
-    }
-
-    public bool IsMentallyHealthy()
-    {
-        return currentMentalHealth > 0;
-    }
-
-    public bool IsGrooming()
-    {
-        return isGrooming;
-    }
-
-    public bool IsTired()
-    {
-        return isTired;
-    }
+    // ì™¸ë¶€ í˜¸ì¶œ ê°€ëŠ¥ í•¨ìˆ˜ë“¤
+    public float GetMentalHealthPercentage() { return currentMentalHealth / maxMentalHealth; }
+    public bool IsMentallyHealthy() { return currentMentalHealth > 0; }
+    public bool IsGrooming() { return isGrooming; }
+    public bool IsTired() { return isTired; }
 }
