@@ -17324,7 +17324,7 @@ MonoBehaviour:
   mainBGM: {fileID: 8300000, guid: bbfddf291aecf3548ba505bff2bd5e14, type: 3}
   teleportBGM: {fileID: 0}
   fadeDuration: 5
-  mainBGMMaxVolume: 0.2
+  mainBGMMaxVolume: 0.3
   teleportBGMMaxVolume: 1
 --- !u!82 &494039182
 AudioSource:
@@ -146220,10 +146220,10 @@ SceneRoots:
   m_Roots:
   - {fileID: 4137260244859160999}
   - {fileID: 3462137999326891304}
+  - {fileID: 758398691}
   - {fileID: 219330316}
   - {fileID: 1390115236}
   - {fileID: 1946185811171284776}
-  - {fileID: 758398691}
   - {fileID: 2137666872}
   - {fileID: 2080633659904322565}
   - {fileID: 1949389336}
