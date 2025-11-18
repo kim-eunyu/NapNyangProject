@@ -166,10 +166,7 @@ public class PlayerMental : MonoBehaviour
         {
             mentalHealthUI.UpdateMentalHealthBar(currentMentalHealth, maxMentalHealth);
         }
-        else
-        {
-            Debug.Log($"정신력: {currentMentalHealth:F1}/{maxMentalHealth}");
-        }
+       
     }
 
     // 테스트용 함수들

@@ -2,7 +2,7 @@ using UnityEngine;
 using UnityEngine.EventSystems; // ⭐ 1. UI 이벤트를 쓰기 위해 이게 꼭 필요해용!
 using System.Collections.Generic; // ⭐ 2. 리스트(List)를 쓰기 위해 이것도 필요해용!
 
-// 으뉴님! UI도 감지하도록 수정했어용!
+// 으뉴님! UI 감지 + '사거리' 감지 기능까지 넣었어용!
 public class CursorManager : MonoBehaviour
 {
     // --- 싱글톤 인스턴스 ---
@@ -14,7 +14,13 @@ public class CursorManager : MonoBehaviour
     [SerializeField] private Texture2D interactCursor;
     private Vector2 hotspot = Vector2.zero;
 
-    // --- Awake() 함수 (싱글톤 처리) ---
+    // --- [!!! 새로 추가 !!!] ---
+    // 3. 거리 계산을 위해 플레이어의 위치를 저장해 둘 변수
+    private Transform playerTransform;
+    // --- [!!! 새로 추가 끝 !!!] ---
+
+
+    // --- Awake() 함수 (싱글톤 + 플레이어 찾기) ---
     void Awake()
     {
         if (Instance != null)
@@ -25,52 +31,48 @@ public class CursorManager : MonoBehaviour
         Instance = this;
         DontDestroyOnLoad(this.gameObject);
         SetDefaultCursor(); // (시작할 때 기본 커서로 설정)
+        
+        // --- [!!! 새로 추가 !!!] ---
+        // 4. 게임 시작 시 'Player' 태그로 플레이어를 찾아놔용.
+        playerTransform = GameObject.FindGameObjectWithTag("Player")?.transform;
+        if (playerTransform == null)
+        {
+            Debug.LogError("CursorManager: 'Player' 태그를 가진 플레이어를 찾을 수 없습니다! 거리 계산이 불가능합니다.");
+        }
+        // --- [!!! 새로 추가 끝 !!!] ---
     }
 
-    // --- 4. Update() 로직 (UI 감지 기능 추가!) ---
+    // --- Update() 로직 (UI 감지 + 3D 사거리 감지!) ---
     void Update()
     {
-        // --- 1순위: UI 감지 (새로 추가된 부분!) ---
+        // --- 1순위: UI 감지 (으뉴님 코드) ---
 
-        // (1) 마우스 위치에 대한 포인터 이벤트 데이터를 만듭니다.
+        // (1)~(3) UI 레이캐스트
         PointerEventData ped = new PointerEventData(EventSystem.current);
         ped.position = Input.mousePosition;
-
-        // (2) 마우스 위치에 있는 모든 UI 요소들을 담을 리스트를 만듭니다.
         List<RaycastResult> results = new List<RaycastResult>();
-
-        // (3) UI 레이캐스트를 쏩니다! (EventSystem이 알아서 해줘용)
         EventSystem.current.RaycastAll(ped, results);
 
-        // (4) 만약 UI가 하나라도 감지되었다면?
+        // (4) UI 감지 시 처리
         if (results.Count > 0)
         {
-            // 감지된 UI 중에서 "Interactable" 태그를 가진 녀석을 찾습니다.
             foreach (RaycastResult result in results)
             {
                 if (result.gameObject.CompareTag("Interactable"))
                 {
-                    // 찾았다! 상호작용 커서로 바꾸고
                     SetCursor(interactCursor);
-                    // 이번 프레임의 커서 검사는 여기서 끝냅니다! (3D 검사 안 함)
-                    return; 
+                    return; // UI 감지했으니 3D 검사 안 함!
                 }
             }
-
-            // 만약 UI가 감지됐지만 "Interactable" 태그는 없었다면?
-            // (예: 그냥 빈 UI 패널 위)
-            // 그냥 기본 커서로 설정하고 검사를 끝냅니다.
             SetDefaultCursor();
-            return;
+            return; // 'Interactable' 아닌 UI라도 3D 검사 안 함!
         }
 
-        // --- 2순위: 3D 월드 감지 (기존 코드) ---
-        // (UI가 아무것도 감지되지 않았을 때만 이 코드가 실행됩니다!)
+        // --- 2순위: 3D 월드 감지 (UI가 감지되지 않았을 때) ---
 
-        if (Camera.main == null)
-        {
-            return; // 안전장치
-        }
+        // (안전 장치)
+        if (Camera.main == null) return;
+        if (playerTransform == null) return; // 플레이어 없으면 3D 검사 안 함
 
         Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
         RaycastHit hit;
@@ -79,9 +81,39 @@ public class CursorManager : MonoBehaviour
         {
             switch (hit.collider.tag)
             {
+                // --- [!!! 여기가 으뉴님이 원하신 핵심 로직 !!!] ---
                 case "Monster":
-                    SetCursor(attackCursor);
-                    break;
+                    // 1. 몬스터 태그가 감지되면, 'Monster.cs' 스크립트를 가져와봄
+                    Monster monster = hit.collider.GetComponent<Monster>();
+                    
+                    // 2. 스크립트가 존재한다면?
+                    if (monster != null)
+                    {
+                        // 3. 몬스터의 '공격 가능 거리' (attackDistance)를 가져옴
+                        float monsterAttackDistance = monster.attackDistance;
+                        // 4. 플레이어와 몬스터의 '현재 거리'를 실시간 계산!
+                        float distance = Vector3.Distance(playerTransform.position, monster.transform.position);
+
+                        // 5. [!!! 비교 !!!]
+                        if (distance <= monsterAttackDistance)
+                        {
+                            // 사거리 안쪽! -> 칼 모양
+                            SetCursor(attackCursor);
+                        }
+                        else
+                        {
+                            // 사거리 밖! -> 기본 모양 (으뉴님 요청)
+                            SetDefaultCursor();
+                        }
+                    }
+                    else
+                    {
+                        // (혹시 몬스터 태그는 있는데 스크립트가 없으면 그냥 기본 커서)
+                        SetDefaultCursor();
+                    }
+                    break; // "Monster" 케이스 끝
+                // --- [!!! 수정된 로직 끝 !!!] ---
+                    
                 case "Interactable":
                     SetCursor(interactCursor);
                     break;
@@ -97,7 +129,7 @@ public class CursorManager : MonoBehaviour
     }
 
 
-    // --- 5. SetCursor 함수들 (기존과 동일) ---
+    // --- SetCursor 함수들 (으뉴님 코드) ---
     public void SetCursor(Texture2D cursorTexture)
     {
         if (cursorTexture != null)

@@ -14,24 +14,23 @@ public class QuestManager : MonoBehaviour
 {
     public static QuestManager Instance;
     
-    // --- 메인 퀘스트 변수들 ---
+    // --- (메인 퀘스트 변수들은 동일) ---
     private MainQuestData mainQuest; 
     [SerializeField]
     private int currentStepIndex = 0;
     private bool isMainQuestActive = false;
     
-    // --- 서브 퀘스트 변수들 ---
+    // --- (서브 퀘스트 변수들은 동일) ---
     private SubQuestData activeSubQuest; 
     private bool isSubQuestActive = false;
     private Dictionary<MonsterType, int> subQuestProgress;
-    // ---
-
-    // --- UI 이벤트들 ---
+    
+    // --- (UI 이벤트들은 동일) ---
     public QuestStepEvent OnMainQuestStepChanged; 
     public UnityEvent OnNewQuestUpdate;           
     public SubQuestUpdateEvent OnSubQuestUpdated; 
-    // ---
 
+    // --- (Awake, Start, 메인 퀘스트 함수들은 100% 동일) ---
     void Awake()
     {
         if (Instance == null)
@@ -45,9 +44,8 @@ public class QuestManager : MonoBehaviour
         }
     }
     
-    void Start() { } // 비워둠
+    void Start() { } 
 
-    // --- 메인 퀘스트 함수들 ---
     public void StartMainQuest(MainQuestData questToStart)
     {
         if (isMainQuestActive) return;
@@ -91,6 +89,7 @@ public class QuestManager : MonoBehaviour
         return currentStepIndex;
     }
     
+    // (이 함수는 '오타 수정판'과 동일)
     public string GetCurrentMainQuestDescription()
     {
         if (isMainQuestActive && mainQuest != null && currentStepIndex < mainQuest.steps.Count)
@@ -104,27 +103,36 @@ public class QuestManager : MonoBehaviour
         return "진행 중인 메인 퀘스트가 없습니다.";
     }
     
-    // --- [!!! 이 함수가 새로 추가되었어용 !!!] ---
+    
+    // --- [!!! 이 함수가 '수정'되었어용 (빨간색으로) !!!] ---
     public string GetCurrentSubQuestDescription()
     {
         if (isSubQuestActive && activeSubQuest != null)
         {
-            // UpdateSubQuestUI() 함수와 동일한 로직으로 텍스트를 만들어 반환해용.
             StringBuilder sb = new StringBuilder();
             sb.AppendLine($"<b>{activeSubQuest.questName}</b>");
             
             foreach (var objective in activeSubQuest.objectives)
             {
-                // (안정성 체크) 딕셔너리가 초기화되었는지 확인
+                int currentAmount = 0;
+                int requiredAmount = objective.requiredAmount;
+                
                 if (subQuestProgress != null && subQuestProgress.ContainsKey(objective.monsterType))
                 {
-                    int currentAmount = subQuestProgress[objective.monsterType];
-                    sb.AppendLine($"- {objective.monsterType}: {currentAmount} / {objective.requiredAmount}");
+                    currentAmount = subQuestProgress[objective.monsterType];
+                }
+                
+                string line = $"- {objective.monsterType}: {currentAmount} / {requiredAmount}";
+                
+                // [!!! 핵심 로직 !!!]
+                if (currentAmount >= requiredAmount)
+                {
+                    // <color=#999999> (회색) 대신 'red'로 바꿨어용!
+                    sb.AppendLine($"<color=red><s>{line}</s></color>");
                 }
                 else
                 {
-                     // (방금 퀘스트를 받아서 딕셔너리가 아직 없을 경우 대비)
-                     sb.AppendLine($"- {objective.monsterType}: 0 / {objective.requiredAmount}");
+                    sb.AppendLine(line);
                 }
             }
             return sb.ToString();
@@ -136,10 +144,12 @@ public class QuestManager : MonoBehaviour
 
         return "진행 중인 서브 퀘스트가 없습니다.";
     }
-    // --- [!!! 추가된 부분 끝 !!!] ---
+    // --- [!!! 수정된 부분 끝 !!!] ---
     
     
     // --- 서브 퀘스트 함수들 ---
+    
+    // (StartSubQuest 함수는 동일)
     public void StartSubQuest(SubQuestData questToStart)
     {
         if (isSubQuestActive) return; 
@@ -161,6 +171,7 @@ public class QuestManager : MonoBehaviour
         Debug.Log($"서브 퀘스트 '{activeSubQuest.questName}' 시작!");
     }
 
+    // (ReportMonsterKill 함수는 동일)
     public void ReportMonsterKill(MonsterType monsterType)
     {
         if (!isSubQuestActive) return; 
@@ -177,22 +188,38 @@ public class QuestManager : MonoBehaviour
         }
     }
 
+    // --- [!!! 이 함수도 '수정'되었어용 (빨간색으로) !!!] ---
     private void UpdateSubQuestUI()
     {
         if (!isSubQuestActive) return;
         
-        // UI에 보낼 텍스트 만들기 (GetCurrentSubQuestDescription과 동일 로직)
         StringBuilder sb = new StringBuilder();
         sb.AppendLine($"<b>{activeSubQuest.questName}</b>");
+        
         foreach (var objective in activeSubQuest.objectives)
         {
             int currentAmount = subQuestProgress[objective.monsterType];
-            sb.AppendLine($"- {objective.monsterType}: {currentAmount} / {objective.requiredAmount}");
+            int requiredAmount = objective.requiredAmount;
+
+            string line = $"- {objective.monsterType}: {currentAmount} / {requiredAmount}";
+                
+            // [!!! 핵심 로직 (동일) !!!]
+            if (currentAmount >= requiredAmount)
+            {
+                // <color=#999999> (회색) 대신 'red'로 바꿨어용!
+                sb.AppendLine($"<color=red><s>{line}</s></color>");
+            }
+            else
+            {
+                sb.AppendLine(line);
+            }
         }
         
         OnSubQuestUpdated.Invoke(sb.ToString());
     }
+    // --- [!!! 수정된 부분 끝 !!!] ---
 
+    // (CheckSubQuestCompletion 함수는 동일)
     private void CheckSubQuestCompletion()
     {
         bool allCompleted = true;
@@ -214,6 +241,7 @@ public class QuestManager : MonoBehaviour
         }
     }
     
+    // (GetRequiredAmount 함수는 동일)
     private int GetRequiredAmount(MonsterType type)
     {
         foreach (var obj in activeSubQuest.objectives)

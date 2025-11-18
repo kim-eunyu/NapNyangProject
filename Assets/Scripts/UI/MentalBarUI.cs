@@ -3,14 +3,14 @@ using UnityEngine.UI;
 
 public class MentalBarUI : MonoBehaviour
 {
-    [Header("UI ÄÄÆ÷³ÍÆ®")]
-    public Image mentalBarFill; // Á¤½Å·Â ¿øÇü °ÔÀÌÁö Fill
-    public Image mentalBarBackground; // Á¤½Å·Â ¿øÇü ¹è°æ
+    [Header("UI ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ®")]
+    public Image mentalBarFill; // ï¿½ï¿½ï¿½Å·ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ Fill
+    public Image mentalBarBackground; // ï¿½ï¿½ï¿½Å·ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½
 
-    [Header("½Ã°¢ È¿°ú")]
-    public bool enablePulseEffect = true; // ³·À» ¶§ ±ôºýÀÓ È¿°ú
-    public float pulseThreshold = 0.3f; // ±ôºýÀÓ ½ÃÀÛ ÀÓ°è°ª
-    public float pulseSpeed = 2f; // ±ôºýÀÓ ¼Óµµ
+    [Header("ï¿½Ã°ï¿½ È¿ï¿½ï¿½")]
+    public bool enablePulseEffect = true; // ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ È¿ï¿½ï¿½
+    public float pulseThreshold = 0.3f; // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½Ó°è°ª
+    public float pulseSpeed = 2f; // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Óµï¿½
 
     private float currentMental;
     private float maxMental;
@@ -19,24 +19,24 @@ public class MentalBarUI : MonoBehaviour
 
     void Start()
     {
-        // ¿øÇü °ÔÀÌÁö ¼³Á¤
+        // ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
         if (mentalBarFill != null)
         {
             mentalBarFill.type = Image.Type.Filled;
             mentalBarFill.fillMethod = Image.FillMethod.Radial360;
-            mentalBarFill.fillOrigin = (int)Image.Origin360.Top; // 12½Ã ¹æÇâºÎÅÍ ½ÃÀÛ
-            mentalBarFill.fillClockwise = true; // ½Ã°è ¹æÇâ
+            mentalBarFill.fillOrigin = (int)Image.Origin360.Top; // 12ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
+            mentalBarFill.fillClockwise = true; // ï¿½Ã°ï¿½ ï¿½ï¿½ï¿½ï¿½
 
-            // ¿ø·¡ »ö»ó ÀúÀå
+            // ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
             originalFillColor = mentalBarFill.color;
         }
 
-        Debug.Log("¿øÇü Á¤½Å·Â °ÔÀÌÁö ÃÊ±âÈ­ ¿Ï·á!");
+        Debug.Log("ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½Å·ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ê±ï¿½È­ ï¿½Ï·ï¿½!");
     }
 
     void Update()
     {
-        // ÆÞ½º È¿°ú Ã³¸®
+        // ï¿½Þ½ï¿½ È¿ï¿½ï¿½ Ã³ï¿½ï¿½
         if (enablePulseEffect && isPulsing)
         {
             HandlePulseEffect();
@@ -50,51 +50,50 @@ public class MentalBarUI : MonoBehaviour
 
         float mentalPercent = current / max;
 
-        // Fill Amount ¾÷µ¥ÀÌÆ® (¿øÇü)
+        // Fill Amount ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ® (ï¿½ï¿½ï¿½ï¿½)
         if (mentalBarFill != null)
         {
             mentalBarFill.fillAmount = mentalPercent;
         }
 
-        // ÆÞ½º È¿°ú Á¶°Ç ÆÇ´Ü
+        // ï¿½Þ½ï¿½ È¿ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½Ç´ï¿½
         bool shouldPulse = mentalPercent <= pulseThreshold;
 
-        // »óÅÂ º¯°æ ½Ã Ã³¸®
+        // ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ Ã³ï¿½ï¿½
         if (isPulsing != shouldPulse)
         {
             isPulsing = shouldPulse;
 
             if (!isPulsing && mentalBarFill != null)
             {
-                // ÆÞ½º Á¾·á ¡æ ¿ø·¡ »ö°ú ¾ËÆÄ º¹¿ø
+                // ï¿½Þ½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
                 Color restoredColor = originalFillColor;
                 restoredColor.a = 1f;
                 mentalBarFill.color = restoredColor;
-                Debug.Log("ÆÞ½º Á¾·á ¡æ ¾ËÆÄ º¹¿ø ¿Ï·á");
+                Debug.Log("ï¿½Þ½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½Ï·ï¿½");
             }
         }
 
-        Debug.Log($"¿øÇü Á¤½Å·Â UI ¾÷µ¥ÀÌÆ®: {mentalPercent:P0}");
     }
 
     void HandlePulseEffect()
     {
         if (mentalBarFill == null) return;
 
-        // ¾ËÆÄ °ªÀ» »çÀÎÆÄ·Î º¯°æÇÏ¿© ±ôºýÀÓ È¿°ú
+        // ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ä·ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ï¿ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ È¿ï¿½ï¿½
         float alpha = 0.7f + 0.3f * Mathf.Sin(Time.time * pulseSpeed);
         Color currentColor = originalFillColor;
         currentColor.a = alpha;
         mentalBarFill.color = currentColor;
     }
 
-    // ±×·ç¹Ö ÁßÀÏ ¶§ ½Ã°¢ È¿°ú
+    // ï¿½×·ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½Ã°ï¿½ È¿ï¿½ï¿½
     public void ShowGroomingEffect()
     {
         if (mentalBarFill != null)
         {
             Color greenColor = Color.green;
-            greenColor.a = mentalBarFill.color.a; // ÇöÀç ¾ËÆÄ À¯Áö
+            greenColor.a = mentalBarFill.color.a; // ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
             mentalBarFill.color = greenColor;
         }
     }
@@ -104,7 +103,7 @@ public class MentalBarUI : MonoBehaviour
         if (mentalBarFill != null)
         {
             Color normalColor = originalFillColor;
-            normalColor.a = mentalBarFill.color.a; // ÇöÀç ¾ËÆÄ À¯Áö
+            normalColor.a = mentalBarFill.color.a; // ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
             mentalBarFill.color = normalColor;
         }
     }

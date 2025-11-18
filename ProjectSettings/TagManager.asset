@@ -9,6 +9,7 @@ TagManager:
   - Interactable
   - UIPopup
   - BatPet
+  - Monster
   layers:
   - Default
   - TransparentFX
