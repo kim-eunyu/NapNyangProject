@@ -34541,6 +34541,21 @@ MonoBehaviour:
   OnNewQuestUpdate:
     m_PersistentCalls:
       m_Calls: []
+  OnSubQuestUpdated:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 11400000, guid: b6371fc6d8e35d74785682a168c172c1, type: 2}
+        m_TargetAssemblyTypeName: 
+        m_MethodName: 
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: 
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!4 &1559179195
 Transform:
   m_ObjectHideFlags: 0
@@ -34742,6 +34757,7 @@ MonoBehaviour:
   mainQuestPage: {fileID: 1537026336}
   subQuestPage: {fileID: 1465044486}
   mainQuestDescriptionText: {fileID: 1128775762}
+  subQuestDescriptionText: {fileID: 767009890}
 --- !u!114 &1580375472
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -53778,13 +53794,54 @@ GameObject:
   m_Component:
   - component: {fileID: 543450652941545821}
   - component: {fileID: 1904022655}
+  - component: {fileID: 919132148738862057}
+  - component: {fileID: 919132148738862056}
   m_Layer: 0
   m_Name: GhostCatNPC
-  m_TagString: Untagged
+  m_TagString: Interactable
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 0
+--- !u!114 &919132148738862056
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 919132148738862055}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f0d5d291376474943898adc030509984, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  questToGive: {fileID: 11400000, guid: b6371fc6d8e35d74785682a168c172c1, type: 2}
+  dialogueWindow: {fileID: 0}
+  closeDialogueButton: {fileID: 0}
+  interactionDistance: 5
+--- !u!136 &919132148738862057
+CapsuleCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 919132148738862055}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Radius: 1.5927267
+  m_Height: 3.926388
+  m_Direction: 1
+  m_Center: {x: -0.000000025428102, y: -0.5274592, z: -0.47025445}
 --- !u!1 &928953248561060127
 GameObject:
   m_ObjectHideFlags: 0

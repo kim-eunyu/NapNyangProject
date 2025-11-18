@@ -1,0 +1,26 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fdef72f56c5344d4e9d5ac0f82cbd29e, type: 3}
+  m_Name: NewSubQuest
+  m_EditorClassIdentifier: 
+  questName: "\uBCF8\uACA9! \uC0AC'\uB0E5'"
+  description: "\"\uBB18\uBB18\uD55C \uC232\" \uC5D0 \uC0AC\uB294 \uC5EC\uB7EC \uBAAC\uC2A4\uD130\uB4E4\uC744
+    \uC885\uB958\uBCC4\uB85C 3\uB9C8\uB9AC\uC529 \uC7A1\uC544\uC624\uB77C\uB0E5!"
+  objectives:
+  - monsterType: 0
+    requiredAmount: 3
+  - monsterType: 1
+    requiredAmount: 3
+  - monsterType: 2
+    requiredAmount: 3
+  - monsterType: 3
+    requiredAmount: 3
