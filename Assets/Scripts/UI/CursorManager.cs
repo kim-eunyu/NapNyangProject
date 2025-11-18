@@ -1,8 +1,9 @@
 using UnityEngine;
-using UnityEngine.EventSystems; // ⭐ 1. UI 이벤트를 쓰기 위해 이게 꼭 필요해용!
-using System.Collections.Generic; // ⭐ 2. 리스트(List)를 쓰기 위해 이것도 필요해용!
+using UnityEngine.EventSystems; 
+using System.Collections.Generic; 
+using UnityEngine.SceneManagement; // [!!! 1. 이게 '무조건' 필요해용 !!!]
 
-// 으뉴님! UI 감지 + '사거리' 감지 기능까지 넣었어용!
+// 으뉴님! UI 감지 + '사거리' 감지 + '씬 로딩' 감지 기능까지 넣었어용!
 public class CursorManager : MonoBehaviour
 {
     // --- 싱글톤 인스턴스 ---
@@ -14,13 +15,11 @@ public class CursorManager : MonoBehaviour
     [SerializeField] private Texture2D interactCursor;
     private Vector2 hotspot = Vector2.zero;
 
-    // --- [!!! 새로 추가 !!!] ---
-    // 3. 거리 계산을 위해 플레이어의 위치를 저장해 둘 변수
+    // --- 플레이어 (씬이 바뀔 때마다 갱신될 변수) ---
     private Transform playerTransform;
-    // --- [!!! 새로 추가 끝 !!!] ---
 
 
-    // --- Awake() 함수 (싱글톤 + 플레이어 찾기) ---
+    // --- Awake() 함수 (싱글톤 + 이벤트 구독) ---
     void Awake()
     {
         if (Instance != null)
@@ -30,30 +29,63 @@ public class CursorManager : MonoBehaviour
         }
         Instance = this;
         DontDestroyOnLoad(this.gameObject);
-        SetDefaultCursor(); // (시작할 때 기본 커서로 설정)
         
-        // --- [!!! 새로 추가 !!!] ---
-        // 4. 게임 시작 시 'Player' 태그로 플레이어를 찾아놔용.
-        playerTransform = GameObject.FindGameObjectWithTag("Player")?.transform;
-        if (playerTransform == null)
-        {
-            Debug.LogError("CursorManager: 'Player' 태그를 가진 플레이어를 찾을 수 없습니다! 거리 계산이 불가능합니다.");
-        }
-        // --- [!!! 새로 추가 끝 !!!] ---
+        SetDefaultCursor(); 
+        
+        // --- [!!! 2. 'Awake'에서 플레이어 찾기 '삭제' !!!] ---
+        // (여기서 찾으면 '로비' 플레이어만 찾으니까, OnSceneLoaded에서 찾을 거예용)
+        
+        // --- [!!! 3. '씬 로드' 이벤트를 '구독' !!!] ---
+        // "씬이 로드될 때마다 OnSceneLoaded 함수를 실행시켜줘!"
+        SceneManager.sceneLoaded += OnSceneLoaded;
+    }
+    
+    // --- [!!! 4. '구독 해제' (메모리 누수 방지용) !!!] ---
+    private void OnDestroy()
+    {
+        // CursorManager가 (혹시라도) 파괴될 땐 구독을 해제해용.
+        SceneManager.sceneLoaded -= OnSceneLoaded;
     }
 
+    // --- [!!! 5. '새로운' 함수: 씬이 로드될 때마다 실행됨 !!!] ---
+    void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+    {
+        // 씬이 새로 로드됐으니, '새로운' 플레이어를 '다시' 찾아용!
+        playerTransform = GameObject.FindGameObjectWithTag("Player")?.transform;
+
+        if (playerTransform == null)
+        {
+            // '로비' 씬처럼 플레이어가 없는 씬일 수도 있으니, '에러' 대신 '로그'로 남겨용.
+            Debug.Log($"CursorManager: '{scene.name}' 씬에 'Player' 태그를 가진 오브젝트가 없네용. (3D 커서 비활성화)");
+        }
+        else
+        {
+            Debug.Log($"CursorManager: '{scene.name}' 씬의 '새로운' 플레이어를 찾았어용!");
+        }
+        
+        // (중요) 씬이 바뀌었으니 커서를 '기본'으로 리셋
+        SetDefaultCursor();
+    }
+    
     // --- Update() 로직 (UI 감지 + 3D 사거리 감지!) ---
     void Update()
     {
         // --- 1순위: UI 감지 (으뉴님 코드) ---
+        
+        // [!!! 6. 'EventSystem.current'가 'null'일 때를 대비한 '안전장치' 추가 !!!]
+        // (씬이 바뀌는 도중에 EventSystem이 잠깐 'null'이 될 수 있어용)
+        if (EventSystem.current == null) 
+        {
+            // SetDefaultCursor(); // (이걸 넣으면 깜빡일 수 있으니, 그냥 둬도 돼용)
+            return; // UI 시스템이 준비 안 됐으면 3D 검사도 하지 마!
+        }
 
-        // (1)~(3) UI 레이캐스트
         PointerEventData ped = new PointerEventData(EventSystem.current);
         ped.position = Input.mousePosition;
         List<RaycastResult> results = new List<RaycastResult>();
         EventSystem.current.RaycastAll(ped, results);
 
-        // (4) UI 감지 시 처리
+        // (UI 감지 시 처리 - 으뉴님 코드와 100% 동일)
         if (results.Count > 0)
         {
             foreach (RaycastResult result in results)
@@ -61,18 +93,20 @@ public class CursorManager : MonoBehaviour
                 if (result.gameObject.CompareTag("Interactable"))
                 {
                     SetCursor(interactCursor);
-                    return; // UI 감지했으니 3D 검사 안 함!
+                    return; 
                 }
             }
             SetDefaultCursor();
-            return; // 'Interactable' 아닌 UI라도 3D 검사 안 함!
+            return; 
         }
 
         // --- 2순위: 3D 월드 감지 (UI가 감지되지 않았을 때) ---
 
-        // (안전 장치)
+        // (안전 장치 - 으뉴님 코드와 100% 동일)
         if (Camera.main == null) return;
-        if (playerTransform == null) return; // 플레이어 없으면 3D 검사 안 함
+        
+        // [!!! 7. 이 'null 체크'가 '게임씬 002'에서도 정상 작동할 거예용 !!!]
+        if (playerTransform == null) return; // '게임씬'의 플레이어를 못 찾았으면 3D 검사 안 함!
 
         Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
         RaycastHit hit;
@@ -81,38 +115,28 @@ public class CursorManager : MonoBehaviour
         {
             switch (hit.collider.tag)
             {
-                // --- [!!! 여기가 으뉴님이 원하신 핵심 로직 !!!] ---
+                // (이 'Monster' 로직은 으뉴님 코드와 100% 동일해용!)
                 case "Monster":
-                    // 1. 몬스터 태그가 감지되면, 'Monster.cs' 스크립트를 가져와봄
                     Monster monster = hit.collider.GetComponent<Monster>();
-                    
-                    // 2. 스크립트가 존재한다면?
                     if (monster != null)
                     {
-                        // 3. 몬스터의 '공격 가능 거리' (attackDistance)를 가져옴
                         float monsterAttackDistance = monster.attackDistance;
-                        // 4. 플레이어와 몬스터의 '현재 거리'를 실시간 계산!
                         float distance = Vector3.Distance(playerTransform.position, monster.transform.position);
 
-                        // 5. [!!! 비교 !!!]
                         if (distance <= monsterAttackDistance)
                         {
-                            // 사거리 안쪽! -> 칼 모양
                             SetCursor(attackCursor);
                         }
                         else
                         {
-                            // 사거리 밖! -> 기본 모양 (으뉴님 요청)
                             SetDefaultCursor();
                         }
                     }
                     else
                     {
-                        // (혹시 몬스터 태그는 있는데 스크립트가 없으면 그냥 기본 커서)
                         SetDefaultCursor();
                     }
-                    break; // "Monster" 케이스 끝
-                // --- [!!! 수정된 로직 끝 !!!] ---
+                    break; 
                     
                 case "Interactable":
                     SetCursor(interactCursor);
