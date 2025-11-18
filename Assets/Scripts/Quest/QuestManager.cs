@@ -104,9 +104,10 @@ public class QuestManager : MonoBehaviour
     }
     
     
-    // --- [!!! 이 함수가 '수정'되었어용 (빨간색으로) !!!] ---
+    // --- [!!! 여기가 '최신' 버전이에용 (데이터 읽기) !!!] ---
     public string GetCurrentSubQuestDescription()
     {
+        // 1. 퀘스트가 '진행 중'일 때 (기존과 동일)
         if (isSubQuestActive && activeSubQuest != null)
         {
             StringBuilder sb = new StringBuilder();
@@ -124,10 +125,8 @@ public class QuestManager : MonoBehaviour
                 
                 string line = $"- {objective.monsterType}: {currentAmount} / {requiredAmount}";
                 
-                // [!!! 핵심 로직 !!!]
                 if (currentAmount >= requiredAmount)
                 {
-                    // <color=#999999> (회색) 대신 'red'로 바꿨어용!
                     sb.AppendLine($"<color=red><s>{line}</s></color>");
                 }
                 else
@@ -137,11 +136,14 @@ public class QuestManager : MonoBehaviour
             }
             return sb.ToString();
         }
+        // 2. [!!! 핵심 !!!] 퀘스트가 '완료'되었을 때
         else if (!isSubQuestActive && activeSubQuest != null)
         {
-            return $"<b>{activeSubQuest.questName} (완료!)</b>";
+            // '데이터 파일'에서 으뉴님이 입력하신 '완료 문구'를 읽어옴!
+            return activeSubQuest.completionMessage; 
         }
 
+        // 3. 아무 퀘스트도 없을 때
         return "진행 중인 서브 퀘스트가 없습니다.";
     }
     // --- [!!! 수정된 부분 끝 !!!] ---
@@ -188,7 +190,7 @@ public class QuestManager : MonoBehaviour
         }
     }
 
-    // --- [!!! 이 함수도 '수정'되었어용 (빨간색으로) !!!] ---
+    // (UpdateSubQuestUI 함수는 동일 - 빨간 줄 그어주는 역할)
     private void UpdateSubQuestUI()
     {
         if (!isSubQuestActive) return;
@@ -200,13 +202,10 @@ public class QuestManager : MonoBehaviour
         {
             int currentAmount = subQuestProgress[objective.monsterType];
             int requiredAmount = objective.requiredAmount;
-
             string line = $"- {objective.monsterType}: {currentAmount} / {requiredAmount}";
                 
-            // [!!! 핵심 로직 (동일) !!!]
             if (currentAmount >= requiredAmount)
             {
-                // <color=#999999> (회색) 대신 'red'로 바꿨어용!
                 sb.AppendLine($"<color=red><s>{line}</s></color>");
             }
             else
@@ -214,12 +213,10 @@ public class QuestManager : MonoBehaviour
                 sb.AppendLine(line);
             }
         }
-        
         OnSubQuestUpdated.Invoke(sb.ToString());
     }
-    // --- [!!! 수정된 부분 끝 !!!] ---
 
-    // (CheckSubQuestCompletion 함수는 동일)
+    // --- [!!! 여기도 '최신' 버전이에용 (데이터 읽기) !!!] ---
     private void CheckSubQuestCompletion()
     {
         bool allCompleted = true;
@@ -232,14 +229,23 @@ public class QuestManager : MonoBehaviour
             }
         }
 
+        // [!!! 핵심 !!!] 모든 퀘스트가 완료되었을 때!
         if (allCompleted)
         {
             Debug.Log($"서브 퀘스트 '{activeSubQuest.questName}' 완료!");
-            isSubQuestActive = false;
-            OnSubQuestUpdated.Invoke($"<b>{activeSubQuest.questName} (완료!)</b>");
+            isSubQuestActive = false; // 퀘스트 상태를 '완료'로 변경
+            
+            // '데이터 파일'에서 으뉴님이 입력하신 '완료 문구'를 읽어옴!
+            string completionMessage = activeSubQuest.completionMessage;
+            
+            // 1. UI에 '완료 메시지'를 쏴줌!
+            OnSubQuestUpdated.Invoke(completionMessage);
+            
+            // 2. QuestIcon에 '반짝여라!' (띵동!) 신호를 쏴줌!
             OnNewQuestUpdate.Invoke(); 
         }
     }
+    // --- [!!! 수정된 부분 끝 !!!] ---
     
     // (GetRequiredAmount 함수는 동일)
     private int GetRequiredAmount(MonsterType type)

@@ -21,4 +21,10 @@ public class SubQuestData : ScriptableObject
 
     // "몬스터 3마리씩" 같은 '병렬' 목표들을 리스트로 관리해용.
     public List<SubQuestObjective> objectives; 
+
+    // --- [!!! 바로 여기! 이 변수를 '추가'했어용 !!!] ---
+    [Header("Completion")]
+    [TextArea(3, 5)]
+    public string completionMessage = "<b>퀘스트 완료!</b>\n\n보상을 받으러 돌아가자.";
+    // --- [!!! 추가된 부분 끝 !!!] ---
 }
