@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: fdef72f56c5344d4e9d5ac0f82cbd29e, type: 3}
-  m_Name: NewSubQuest
+  m_Name: SubQuest
   m_EditorClassIdentifier: 
   questName: "\uBCF8\uACA9! \uC0AC'\uB0E5'"
   description: "\"\uBB18\uBB18\uD55C \uC232\" \uC5D0 \uC0AC\uB294 \uC5EC\uB7EC \uBAAC\uC2A4\uD130\uB4E4\uC744
