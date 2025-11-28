@@ -25185,7 +25185,7 @@ GameObject:
   - component: {fileID: 784289473}
   - component: {fileID: 784289472}
   m_Layer: 0
-  m_Name: BastetNPC
+  m_Name: '*BastetNPC'
   m_TagString: Interactable
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -60529,7 +60529,7 @@ GameObject:
   - component: {fileID: 919132148738862057}
   - component: {fileID: 919132148738862056}
   m_Layer: 0
-  m_Name: GhostCatNPC
+  m_Name: '*GhostCatNPC'
   m_TagString: Interactable
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -73636,7 +73636,7 @@ GameObject:
   - component: {fileID: 2139282981093599769}
   - component: {fileID: 5426958900842901603}
   m_Layer: 0
-  m_Name: SkillNPC
+  m_Name: '*SkillNPC'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -74745,7 +74745,7 @@ GameObject:
   - component: {fileID: 5183183959030175494}
   - component: {fileID: 5183183959030175495}
   m_Layer: 0
-  m_Name: PetStoreNPC
+  m_Name: '*PetStoreNPC'
   m_TagString: Interactable
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -154146,7 +154146,7 @@ GameObject:
   - component: {fileID: 8883432513458079124}
   - component: {fileID: 8883432513458079123}
   m_Layer: 0
-  m_Name: ShopNPC
+  m_Name: '*ShopNPC'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
