@@ -140,6 +140,13 @@ public class PlayerController : MonoBehaviour
     {
         if (animator == null) return;
 
+        // ▼▼▼ [추가된 부분] 테스트용: F키를 누르면 데미지 모션 실행! ▼▼▼
+        if (Input.GetKeyDown(KeyCode.F))
+        {
+            OnTakeDamage();
+        }
+        // ▲▲▲▲▲▲
+
         if (IsTired())
         {
             animator.SetBool("IsGrooming", Input.GetKey(KeyCode.Q));
@@ -157,7 +164,6 @@ public class PlayerController : MonoBehaviour
         animator.SetBool("IsGrooming", Input.GetKey(KeyCode.Q));
     }
 
-    // ▼▼▼ 여기가 으뉴님이 원하시는 대로 고쳐진 핵심입니다! ▼▼▼
     void HandleAnimations()
     {
         if (animator == null) return;
@@ -179,24 +185,31 @@ public class PlayerController : MonoBehaviour
         animator.SetFloat("Speed", speedVal);
         animator.SetBool("IsTired", IsTired());
 
-        // [수정 포인트 1] 땅에 닿아있으면 점프 애니메이션을 끕니다. (착지)
         if (isGrounded)
         {
             animator.SetBool("IsJumping", false);
         }
 
-        // [수정 포인트 2] "공중에 있다고" 무조건 점프 모션을 켜는 코드를 삭제했습니다.
-        // 대신, 스페이스바를 눌렀을 때만 점프 모션을 켭니다!
         if (Input.GetKeyDown(KeyCode.Space) && isGrounded)
         {
-            // 물리적인 점프
             rb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
-            
-            // 애니메이션 점프 (여기서 켜짐!)
             animator.SetBool("IsJumping", true);
         }
     }
-    // ▲▲▲ 수정 끝 ▲▲▲
+
+    // ▼▼▼ [새로 추가된 함수] 외부에서 이 함수를 부르면 데미지 모션이 나옵니다! ▼▼▼
+    public void OnTakeDamage()
+    {
+        if (animator != null)
+        {
+            // 애니메이터에 'TakeDamage' 라는 Trigger를 발동시킴
+            animator.SetTrigger("TakeDamage");
+            
+            // 필요하다면 여기에 "윽!" 하는 소리를 넣거나 이펙트를 추가해도 좋아용.
+            Debug.Log("으악! 데미지를 입었어용!");
+        }
+    }
+    // ▲▲▲▲▲▲
 
     bool IsTired()
     {
